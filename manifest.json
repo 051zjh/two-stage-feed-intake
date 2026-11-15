@@ -17,5 +17,6 @@
   "private_backup_date": "2026-11-15",
   "repository": "https://github.com/051zjh/two-stage-feed-intake",
   "repository_visibility": "public",
-  "public_release_date": "2026-11-15"
+  "public_release_date": "2026-11-15",
+  "license": "MIT"
 }

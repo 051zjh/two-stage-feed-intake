@@ -1,6 +1,6 @@
 # Two-stage feed-intake estimation
 
-Estimate individual pig feed intake by combining depth-based feed-weight estimation with virtual feed-pan reconstruction. This repository provides the Python implementation, depth-image samples, de-identified feeding-event data, and reference predictions for running the analysis.
+Estimate individual pig feed intake by combining depth-based feed-weight estimation with virtual feed-pan reconstruction. This repository provides the Python implementation, depth-image samples, feeding records, and analysis scripts.
 
 ## How it works
 
@@ -38,37 +38,6 @@ A successful run prints `"status": "PASS"`. Generated files are saved to:
 | `results/verification/reproduced_mean_predictions.csv` | Event-level mean predictions and simulation percentiles |
 | `results/stage2_reanalysis/` | Candidate selection and Stage-II prediction outputs |
 
-## Reference results
-
-| Analysis | Evaluation data | MAE (kg) |
-|---|---|---:|
-| Stage I: feed-weight estimation | 239 OOF samples | 0.7637 |
-| Stage II: visit-level intake estimation | 1,298 temporal test visits | 0.0514 |
-| Simulated linkage: average run-level MAE | 1,000 replicates over the test visits | 0.0702 |
-| Simulated linkage: MAE of mean predictions | Predictions averaged per visit across replicates | 0.0577 |
-
-The linkage rows summarize the error of individual simulation runs and the error after averaging predictions for each visit, respectively.
-
-## Repository layout
-
-```text
-data/
-  stage1/                 Depth frames, empty-hopper baseline, labels, OOF predictions
-  stage2/
-    splits/               Chronological feeding-event splits
-    frozen_predictions.csv.gz
-  linkage/                Reference simulation metrics and mean predictions
-src/
-  stage1/                 Depth-model training, OOF export, metric calculation
-  stage2/                 Virtual feed-pan model, rate selection, baselines
-  linkage/                Measurement-error propagation and intake simulation
-  reproduce_all.py        Main analysis entry point
-results/
-  verification/           Reference verification reports and reproduced outputs
-requirements.txt          Dependencies for the main analysis
-requirements-stage1.txt   Additional dependencies for the depth model
-```
-
 ## Run individual components
 
 Run these commands from the repository root after installing `requirements.txt`.
@@ -102,7 +71,7 @@ The training script uses the supplied 239 depth frames, feed-weight labels, and 
 
 Custom data and output locations can be set through `FCR_LABEL_CSV`, `FCR_IMG_ROOT`, `FCR_BASELINE_PATH`, and `FCR_KFOLD_DIR`. The original trained checkpoints are not bundled; the main analysis calculates Stage-I reference metrics from the supplied OOF predictions, while this command trains new models.
 
-## Feeding-event data
+## Data
 
 The Stage-II dataset contains 13,136 events in four chronological splits:
 
@@ -130,4 +99,4 @@ Animal and station identifiers are replaced with pseudonyms, and a common date s
 
 ## License
 
-A software and data license has not yet been specified.
+This project is licensed under the [MIT License](LICENSE).
