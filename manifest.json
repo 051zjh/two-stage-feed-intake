@@ -1,5 +1,6 @@
 {
-  "release_date": "2026-11-12",
+  "release_date": "2026-11-15",
+  "package_prepared_date": "2026-11-12",
   "stage1_oof_rows": 239,
   "stage2_rows": 91952,
   "stage2_configurations": [
@@ -12,8 +13,9 @@
     "state_train_rate_q0.60_x1.1_reset30m"
   ],
   "identifiers": "fixed-width ordered integer replacements; dates shifted to a neutral origin without releasing the mapping or original dates",
-  "upload_status": "saved in a private GitHub repository; not publicly accessible",
+  "upload_status": "publicly available in the GitHub repository",
   "private_backup_date": "2026-11-15",
   "repository": "https://github.com/051zjh/two-stage-feed-intake",
-  "repository_visibility": "private"
+  "repository_visibility": "public",
+  "public_release_date": "2026-11-15"
 }

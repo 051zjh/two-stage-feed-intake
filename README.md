@@ -58,4 +58,4 @@ The chronological splits contain 9,074 training, 2,592 validation, 1,298 test, a
 
 ## Publication status
 
-This package was saved to the private GitHub repository `051zjh/two-stage-feed-intake` on 15 November 2026. Access is restricted to the repository owner and explicitly authorized collaborators; this is not a public data or code release. No manuscript DOI or release DOI is asserted. The package excludes identifiable raw records, manuscripts, copyrighted reference PDFs, and Oracle/teacher-forcing models. An open-source/data license has not been selected; no additional license grant is implied.
+This package is publicly available at [051zjh/two-stage-feed-intake](https://github.com/051zjh/two-stage-feed-intake), with public release on 15 November 2026. It contains de-identified analysis inputs, representative depth images, frozen predictions, and analysis code. No manuscript DOI or release DOI is asserted. The package excludes identifiable raw records, identifier maps, manuscripts, copyrighted reference PDFs, and Oracle/teacher-forcing models. An open-source/data license has not been selected; no additional license grant is implied.
