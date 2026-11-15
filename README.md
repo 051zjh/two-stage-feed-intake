@@ -1,47 +1,119 @@
-# Two-stage feed-intake estimation: reproducibility package
+# Two-stage feed-intake estimation
 
-This package supports the manuscript "Estimating individual pig feed intake through depth vision and virtual feed-pan reconstruction", prepared for submission to *The Innovation*. It contains de-identified analysis inputs, frozen out-of-fold and event-level predictions, and reproducible analysis code.
+Estimate individual pig feed intake by combining depth-based feed-weight estimation with virtual feed-pan reconstruction. This repository provides the Python implementation, depth-image samples, de-identified feeding-event data, and reference predictions for running the analysis.
 
-The two stages were validated on separate datasets. The linkage is controlled propagation of empirical Stage-I endpoint errors through the Stage-II recursion, not a synchronized end-to-end visual feeding trial. Oracle/teacher-forcing outputs are excluded.
+## How it works
 
-## Contents
+1. **Depth-based feed-weight estimation.** Stage I uses depth differences relative to an empty-hopper baseline to estimate the weight of visible feed.
+2. **Virtual feed-pan reconstruction.** Stage II tracks residual feed between visits and combines feed delivery, visit duration, and a feeding-rate prior to estimate intake for each visit.
+3. **Simulated linkage.** Repeated simulations propagate empirical Stage-I measurement errors through Stage II to evaluate their effect on intake estimates.
 
-- `data/stage1/`: 239 representative depth frames, labels, and locked OOF predictions.
-- `data/stage2/splits/`: de-identified train/validation/test event tables.
-- `data/stage2/frozen_predictions.csv.gz`: selected current-prior and baseline predictions.
-- `data/linkage/`: the 1,000 reference simulation errors and 1,298 event-level mean predictions used in Figure 5.
-- `src/stage1/verify_oof_metrics.py`: verifies locked Stage-I metrics.
-- `src/stage2/reproduce_selection.py`: reruns the Stage-II rate-prior grid.
-- `src/linkage/propagation_core.py`: the source numerical recursion with relative data paths.
-- `src/reproduce_all.py`: reruns validation selection and all 1,000 linkage replicates, checks them against the locked source outputs, and writes a verification report.
+The two stages are evaluated on separate datasets; simulated linkage connects the visual measurement errors with the event-level intake model.
 
-## Reproduce the main results
+## Quick start
 
-Use Python 3.10 or newer. The numerical verification does not require a GPU or PyTorch.
+Use Python 3.10 or newer. The main analysis runs on CPU with the dependencies in `requirements.txt`; PyTorch is needed only for Stage-I model training and inference.
 
 ```bash
+git clone https://github.com/051zjh/two-stage-feed-intake.git
+cd two-stage-feed-intake
+python -m venv .venv
+source .venv/bin/activate
 python -m pip install -r requirements.txt
 python src/reproduce_all.py
 ```
 
-For the originating project environment, `bash reproduce.sh` defaults to the project's Python interpreter. Other environments can use `PYTHON=python bash reproduce.sh`.
+The last command performs three steps:
 
-The script checks the Stage-I OOF metrics and fold assignments, reruns the 48-candidate Stage-II rate-prior search using validation events only, and reruns the Figure-5 simulated linkage with seed 20261008 and 1,000 replicates. It verifies all 13,136 primary predictions against frozen outputs and checks the linked prediction errors against the supplied source data. Reports are written to `results/verification/`.
+- Calculates Stage-I metrics from the supplied out-of-fold (OOF) predictions and checks sample paths and five-fold assignments.
+- Evaluates 48 Stage-II rate-prior candidates on the validation split, then reproduces the selected model and baseline predictions.
+- Runs 1,000 simulated-linkage replicates with seed `20261008` and compares the results with the reference outputs.
 
-Expected results are Stage-I MAE 0.7637 kg (239 samples), Stage-II test MAE 0.0514 kg (1,298 visits), simulated-linkage mean MAE 0.0702 kg, and Monte Carlo mean-prediction MAE 0.0577 kg. The two linkage MAEs summarize different quantities.
+A successful run prints `"status": "PASS"`. Generated files are saved to:
 
-## Stage-I model code
+| Path | Output |
+|---|---|
+| `results/verification/verification.json` | Metrics and reference-comparison checks |
+| `results/verification/reproduced_simulation_metrics.csv` | MAE for each simulated-linkage replicate |
+| `results/verification/reproduced_mean_predictions.csv` | Event-level mean predictions and simulation percentiles |
+| `results/stage2_reanalysis/` | Candidate selection and Stage-II prediction outputs |
 
-`src/stage1/train_kfold_diff.py` supplies the source training implementation with relative paths and the original hyperparameters. The 239 supplied frames are the same representative frames used by the original sample construction. The supplied label order reproduces the locked five-fold assignment (seed 42). `export_locked_kfold_oof.py` can export predictions when the five original model checkpoints and fold-score report are supplied.
+## Reference results
+
+| Analysis | Evaluation data | MAE (kg) |
+|---|---|---:|
+| Stage I: feed-weight estimation | 239 OOF samples | 0.7637 |
+| Stage II: visit-level intake estimation | 1,298 temporal test visits | 0.0514 |
+| Simulated linkage: average run-level MAE | 1,000 replicates over the test visits | 0.0702 |
+| Simulated linkage: MAE of mean predictions | Predictions averaged per visit across replicates | 0.0577 |
+
+The linkage rows summarize the error of individual simulation runs and the error after averaging predictions for each visit, respectively.
+
+## Repository layout
+
+```text
+data/
+  stage1/                 Depth frames, empty-hopper baseline, labels, OOF predictions
+  stage2/
+    splits/               Chronological feeding-event splits
+    frozen_predictions.csv.gz
+  linkage/                Reference simulation metrics and mean predictions
+src/
+  stage1/                 Depth-model training, OOF export, metric calculation
+  stage2/                 Virtual feed-pan model, rate selection, baselines
+  linkage/                Measurement-error propagation and intake simulation
+  reproduce_all.py        Main analysis entry point
+results/
+  verification/           Reference verification reports and reproduced outputs
+requirements.txt          Dependencies for the main analysis
+requirements-stage1.txt   Additional dependencies for the depth model
+```
+
+## Run individual components
+
+Run these commands from the repository root after installing `requirements.txt`.
+
+### Stage-I prediction metrics
+
+```bash
+python src/stage1/verify_oof_metrics.py
+```
+
+This prints the sample count, R2, MAE, RMSE, and bias calculated from `data/stage1/oof_predictions.csv`.
+
+### Stage-II model selection
+
+```bash
+python src/stage2/reproduce_selection.py \
+  --data-dir data/stage2/splits \
+  --out-dir results/stage2_reanalysis
+```
+
+Feeding-rate priors are estimated from training events, and the quantile and multiplier are selected by validation MAE. Test intake labels are used for evaluation. The primary model uses a 30-minute residual-state decay half-life.
+
+### Stage-I model training
 
 ```bash
 python -m pip install -r requirements-stage1.txt
 python src/stage1/train_kfold_diff.py
 ```
 
-The five original model checkpoints are not included. Training is stochastic; the verification uses the supplied frozen OOF predictions and does not claim to have retrained the network or re-created the exact checkpoint weights.
+The training script uses the supplied 239 depth frames, feed-weight labels, and empty-hopper baseline. It defaults to a single-channel ResNet-18 and five-fold cross-validation, saving new checkpoints and fold results to `results/stage1_retraining/`.
 
-## Event data fields
+Custom data and output locations can be set through `FCR_LABEL_CSV`, `FCR_IMG_ROOT`, `FCR_BASELINE_PATH`, and `FCR_KFOLD_DIR`. The original trained checkpoints are not bundled; the main analysis calculates Stage-I reference metrics from the supplied OOF predictions, while this command trains new models.
+
+## Feeding-event data
+
+The Stage-II dataset contains 13,136 events in four chronological splits:
+
+| File in `data/stage2/splits/` | Events |
+|---|---:|
+| `train.csv` | 9,074 |
+| `val.csv` | 2,592 |
+| `test.csv` | 1,298 |
+| `val_final.csv` | 172 |
+
+The source column names are retained for compatibility with the analysis scripts:
 
 | CSV column | Meaning |
 |---|---|
@@ -54,8 +126,8 @@ The five original model checkpoints are not included. Training is stochastic; th
 | 体重 | Recorded body weight (kg) |
 | 投料量 | Event delivery (kg) |
 
-The chronological splits contain 9,074 training, 2,592 validation, 1,298 test, and 172 additional-validation events. Original animal and station identifiers are replaced by ordered pseudonyms. Dates are shifted by the same offset to a neutral origin, preserving durations, event gaps, split membership, and sequence ordering. The identifier map and original calendar dates are excluded. These transformations support de-identification; they are not a claim of formal irreversible anonymization.
+Animal and station identifiers are replaced with pseudonyms, and a common date shift preserves event order, visit durations, and gaps between visits. Original identifiers, identifier mappings, and unshifted calendar dates are not distributed.
 
-## Publication status
+## License
 
-This package is publicly available at [051zjh/two-stage-feed-intake](https://github.com/051zjh/two-stage-feed-intake), with public release on 15 November 2026. It contains de-identified analysis inputs, representative depth images, frozen predictions, and analysis code. No manuscript DOI or release DOI is asserted. The package excludes identifiable raw records, identifier maps, manuscripts, copyrighted reference PDFs, and Oracle/teacher-forcing models. An open-source/data license has not been selected; no additional license grant is implied.
+A software and data license has not yet been specified.
