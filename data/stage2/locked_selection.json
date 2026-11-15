@@ -1,0 +1,42 @@
+{
+  "primary_config": "state_train_rate_q0.60_x1.1_decay_0.5h",
+  "current_event_config": "current_only_train_rate_q0.60_x1.1",
+  "selection_split": "val",
+  "criterion": "minimum_validation_MAE_for_rate_grid_at_locked_decay",
+  "selection_scope": "rate_quantile_and_multiplier_conditional_on_locked_decay",
+  "rate_prior_source": "training_split_only",
+  "rate_quantile": 0.6,
+  "rate_multiplier": 1.1,
+  "decay_half_life_s": 1800.0,
+  "decay_sensitivity_grid_minutes": [
+    15,
+    30,
+    45,
+    60,
+    90,
+    120
+  ],
+  "decay_selection_source": "earlier_validation_only_fixed_rate_sweep",
+  "decay_locked_before_rate_prior_selection": true,
+  "joint_decay_rate_grid_searched": false,
+  "test_labels_update_rate": false,
+  "test_labels_update_state": false,
+  "uses_body_weight_rate_cap": false,
+  "uses_fixed_capacity_bound": false,
+  "component_ablation_configs": [
+    "current_only_train_rate_q0.60_x1.1",
+    "state_global_rate_q0.60_x1.1_decay_0.5h"
+  ],
+  "state_rule_sensitivity_configs": [
+    "state_train_rate_q0.60_x1.1_reset30m",
+    "state_train_rate_q0.60_x1.1_no_decay_reset"
+  ],
+  "decay_sensitivity_configs": [
+    "state_train_rate_q0.60_x1.1_decay_0.25h",
+    "state_train_rate_q0.60_x1.1_decay_0.75h",
+    "state_train_rate_q0.60_x1.1_decay_1h",
+    "state_train_rate_q0.60_x1.1_decay_1.5h",
+    "state_train_rate_q0.60_x1.1_decay_2h"
+  ],
+  "previous_primary_config": null
+}

@@ -1,0 +1,16 @@
+{
+  "release_date": "2026-11-12",
+  "stage1_oof_rows": 239,
+  "stage2_rows": 91952,
+  "stage2_configurations": [
+    "baseline_drop",
+    "baseline_time",
+    "current_only_train_rate_q0.60_x1.1",
+    "state_global_rate_q0.60_x1.1_decay_0.5h",
+    "state_train_rate_q0.60_x1.1_decay_0.5h",
+    "state_train_rate_q0.60_x1.1_no_decay_reset",
+    "state_train_rate_q0.60_x1.1_reset30m"
+  ],
+  "identifiers": "fixed-width ordered integer replacements; dates shifted to a neutral origin without releasing the mapping or original dates",
+  "upload_status": "local package prepared; GitHub upload has not occurred"
+}

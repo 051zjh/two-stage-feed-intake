@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "files_scanned": 32,
+  "original_animal_identifiers_found": 0,
+  "original_station_identifiers_found_in_split_columns": 0,
+  "original_source_dates_found": 0,
+  "absolute_data_paths_found": 0,
+  "project_interpreter_default_only": "reproduce.sh",
+  "date_offset_or_identifier_map_released": false,
+  "raw_documents_or_reference_PDFs": 0,
+  "scope": "Identifier/date/path and file-type checks; not proof of irreversible anonymization"
+}

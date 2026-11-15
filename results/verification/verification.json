@@ -1,0 +1,66 @@
+{
+  "stage1_frozen_OOF": {
+    "n": 239,
+    "R2": 0.9913187362687358,
+    "MAE": 0.7637209225773315,
+    "RMSE": 1.0048893923461215,
+    "Bias": -0.2590916075092975
+  },
+  "stage1_retraining": "Code and representative frames supplied; checkpoints and exact retraining not included in this verification",
+  "stage2_selected_quantile": 0.6,
+  "stage2_selected_multiplier": 1.1,
+  "stage2_temporal_test": {
+    "n": 1298,
+    "R2": 0.9132261764709994,
+    "MAE": 0.05144655367644026,
+    "RMSE": 0.07765144728063475,
+    "Bias": -0.025885064873083147
+  },
+  "stage2_all_primary_prediction_max_difference": 0.0,
+  "stage2_all_baseline_prediction_max_difference": 2.220446049250313e-16,
+  "linkage": {
+    "seed": 20261008,
+    "replicates": 1000,
+    "mean_MAE_kg": 0.07022485215616389,
+    "MAE_p2_5_kg": 0.0665844956537257,
+    "MAE_p97_5_kg": 0.07408390790028607,
+    "mean_prediction_metrics": {
+      "n": 1298,
+      "R2": 0.8969530570737477,
+      "MAE": 0.05771468589014814,
+      "RMSE": 0.08461994594132324,
+      "Bias": -0.0036098377495099986
+    },
+    "reference_replicate_MAE_max_difference": 9.71445146547012e-17,
+    "reference_mean_prediction_max_difference": 2.220446049250313e-16,
+    "max_mass_balance_error": 0.0
+  },
+  "zero_error_controls": {
+    "primary": {
+      "got": 0.051447,
+      "expected": 0.0514,
+      "abs_diff": 4.7e-05,
+      "ok": true
+    },
+    "current_event": {
+      "got": 0.055375,
+      "expected": 0.0554,
+      "abs_diff": 2.5e-05,
+      "ok": true
+    },
+    "drop": {
+      "got": 0.05807,
+      "expected": 0.0581,
+      "abs_diff": 3e-05,
+      "ok": true
+    },
+    "global_rate": {
+      "got": 0.067328,
+      "expected": 0.0673,
+      "abs_diff": 2.8e-05,
+      "ok": true
+    },
+    "all_ok": true
+  },
+  "status": "PASS"
+}

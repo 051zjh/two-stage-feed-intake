@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+.env
+.env.*
+results/stage1_retraining/
+results/stage2_reanalysis/
+*.pth
+*.pt
